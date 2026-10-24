@@ -1,0 +1,21 @@
+# วัดผลการค้นคืนทุก push และ pull request · ไม่ใช้ secret หรือ API key ใด ๆ
+name: rag-eval
+
+on: [push, pull_request]
+
+permissions:
+  contents: read
+
+jobs:
+  eval:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+      - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065 # v5
+        with:
+          python-version: "3.13"
+      - run: pip install -r requirements.txt
+      - run: pytest -q
+      # evaluate.py เขียนตารางลง $GITHUB_STEP_SUMMARY เอง · --min-hit ทำให้ CI แดงถ้าการค้นคืนแย่ลง
+      - name: Retrieval eval (tfidf baseline)
+        run: python -m rag.evaluate --split dev --method tfidf -k 4 --min-hit 0.9
