@@ -16,6 +16,10 @@ jobs:
           python-version: "3.13"
       - run: pip install -r requirements.txt
       - run: pytest -q
+      - run: pytest -q -m w4
       # evaluate.py เขียนตารางลง $GITHUB_STEP_SUMMARY เอง · --min-hit ทำให้ CI แดงถ้าการค้นคืนแย่ลง
       - name: Retrieval eval (tfidf baseline)
         run: python -m rag.evaluate --split dev --method tfidf -k 4 --min-hit 0.9
+      # hybrid กรองฉบับ superseded ออก · ชุด test ไม่รันใน CI เพราะวัดได้ครั้งเดียวตอนจบ
+      - name: Retrieval eval (hybrid)
+        run: python -m rag.evaluate --split dev --method hybrid -k 4 --min-hit 0.9
